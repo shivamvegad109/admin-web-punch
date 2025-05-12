@@ -1,0 +1,235 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Settings - Face Recognition Admin{% endblock %}
+
+{% block page_title %}System Settings{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-6">
+        <!-- Camera Settings Card -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Camera Settings</h6>
+            </div>
+            <div class="card-body">
+                <form id="cameraSettingsForm">
+                    <div class="mb-3">
+                        <label for="rtspUrl" class="form-label">RTSP URL</label>
+                        <input type="text" class="form-control" id="rtspUrl" name="rtspUrl" value="{{ config.RTSP_URL }}">
+                        <div class="form-text">URL for IP camera. Leave empty to use default webcam.</div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="resolution" class="form-label">Resolution</label>
+                            <select class="form-select" id="resolution" name="resolution">
+                                <option value="640x480">640x480 (SD)</option>
+                                <option value="1280x720">1280x720 (HD)</option>
+                                <option value="1920x1080">1920x1080 (Full HD)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="fps" class="form-label">Frame Rate (FPS)</label>
+                            <select class="form-select" id="fps" name="fps">
+                                <option value="10">10 FPS</option>
+                                <option value="15" selected>15 FPS</option>
+                                <option value="30">30 FPS</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Save Camera Settings</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Face Recognition Settings Card -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Face Recognition Settings</h6>
+            </div>
+            <div class="card-body">
+                <form id="faceRecognitionForm">
+                    <div class="mb-3">
+                        <label for="detectionConfidence" class="form-label">Detection Confidence</label>
+                        <input type="range" class="form-range" min="0.3" max="0.9" step="0.05" id="detectionConfidence" name="detectionConfidence" value="0.6">
+                        <div class="d-flex justify-content-between">
+                            <span>Low (More Detections)</span>
+                            <span id="confidenceValue">0.6</span>
+                            <span>High (More Accurate)</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="recognitionModel" class="form-label">Recognition Model</label>
+                        <select class="form-select" id="recognitionModel" name="recognitionModel">
+                            <option value="hog">HOG (CPU, Faster)</option>
+                            <option value="cnn">CNN (GPU, More Accurate)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="matchThreshold" class="form-label">Match Threshold</label>
+                        <input type="range" class="form-range" min="0.4" max="0.8" step="0.05" id="matchThreshold" name="matchThreshold" value="0.6">
+                        <div class="d-flex justify-content-between">
+                            <span>Low (More Matches)</span>
+                            <span id="thresholdValue">0.6</span>
+                            <span>High (More Accurate)</span>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Save Recognition Settings</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6">
+        <!-- System Settings Card -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">System Settings</h6>
+            </div>
+            <div class="card-body">
+                <form id="systemSettingsForm">
+                    <div class="mb-3">
+                        <label for="attendanceCooldown" class="form-label">Attendance Cooldown (minutes)</label>
+                        <input type="number" class="form-control" id="attendanceCooldown" name="attendanceCooldown" value="5" min="1" max="60">
+                        <div class="form-text">Minimum time between attendance logs for the same person.</div>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="enableNotifications" name="enableNotifications">
+                        <label class="form-check-label" for="enableNotifications">Enable Notifications</label>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="showFPS" name="showFPS" checked>
+                        <label class="form-check-label" for="showFPS">Show FPS Counter</label>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="enableDebug" name="enableDebug">
+                        <label class="form-check-label" for="enableDebug">Enable Debug Mode</label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Save System Settings</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Database Settings Card -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Database Management</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <h6>Database Information</h6>
+                    <p>Type: SQLite</p>
+                    <p>Path: {{ config.DB_PATH }}</p>
+                </div>
+                
+                <div class="mb-3">
+                    <button id="backupBtn" class="btn btn-info">
+                        <i class="fas fa-download"></i> Backup Database
+                    </button>
+                </div>
+                
+                <div class="mb-3">
+                    <button id="rebuildBtn" class="btn btn-warning">
+                        <i class="fas fa-sync"></i> Rebuild Face Encodings
+                    </button>
+                </div>
+                
+                <div class="mb-3">
+                    <button id="purgeBtn" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#purgeModal">
+                        <i class="fas fa-trash"></i> Purge Old Records
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Purge Modal -->
+<div class="modal fade" id="purgeModal" tabindex="-1" aria-labelledby="purgeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="purgeModalLabel">Purge Old Records</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>This will permanently delete attendance records older than the selected date.</p>
+                <form id="purgeForm">
+                    <div class="mb-3">
+                        <label for="purgeDate" class="form-label">Delete records older than:</label>
+                        <input type="date" class="form-control" id="purgeDate" name="purgeDate" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmPurgeBtn">Purge Records</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Update range input values
+    document.getElementById('detectionConfidence').addEventListener('input', function() {
+        document.getElementById('confidenceValue').textContent = this.value;
+    });
+    
+    document.getElementById('matchThreshold').addEventListener('input', function() {
+        document.getElementById('thresholdValue').textContent = this.value;
+    });
+    
+    // Form submission handlers
+    document.getElementById('cameraSettingsForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        // In a real app, this would save to the server
+        alert('Camera settings saved!');
+    });
+    
+    document.getElementById('faceRecognitionForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        // In a real app, this would save to the server
+        alert('Face recognition settings saved!');
+    });
+    
+    document.getElementById('systemSettingsForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        // In a real app, this would save to the server
+        alert('System settings saved!');
+    });
+    
+    // Database action handlers
+    document.getElementById('backupBtn').addEventListener('click', function() {
+        // In a real app, this would trigger a database backup
+        alert('Database backup started!');
+    });
+    
+    document.getElementById('rebuildBtn').addEventListener('click', function() {
+        // In a real app, this would rebuild face encodings
+        alert('Rebuilding face encodings. This may take a while...');
+    });
+    
+    document.getElementById('confirmPurgeBtn').addEventListener('click', function() {
+        const purgeDate = document.getElementById('purgeDate').value;
+        if (!purgeDate) {
+            alert('Please select a date.');
+            return;
+        }
+        
+        // In a real app, this would purge old records
+        alert(`Records older than ${purgeDate} will be purged.`);
+        $('#purgeModal').modal('hide');
+    });
+</script>
+{% endblock %}

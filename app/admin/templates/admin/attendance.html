@@ -1,0 +1,178 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Attendance - Face Recognition Admin{% endblock %}
+
+{% block page_title %}Attendance Records{% endblock %}
+
+{% block content %}
+<!-- Date Filter -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Filter by Date</h6>
+    </div>
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-center">
+            <div class="col-auto">
+                <label for="date" class="visually-hidden">Date</label>
+                <input type="date" class="form-control" id="date" name="date" value="{{ selected_date.strftime('%Y-%m-%d') }}">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </div>
+            <div class="col-auto">
+                <a href="{{ url_for('admin.attendance') }}" class="btn btn-secondary">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Attendance Table Card -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+        <h6 class="m-0 font-weight-bold text-primary">Attendance for {{ selected_date.strftime('%B %d, %Y') }}</h6>
+        <button class="btn btn-sm btn-outline-primary" id="exportBtn">
+            <i class="fas fa-download"></i> Export
+        </button>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="attendanceTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Employee ID</th>
+                        <th>Name</th>
+                        <th>Position</th>
+                        <th>Check-in Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for attendance, employee in attendance_records %}
+                    <tr>
+                        <td>{{ employee.id }}</td>
+                        <td>{{ employee.name }}</td>
+                        <td>{{ employee.position or 'N/A' }}</td>
+                        <td>{{ attendance.timestamp.strftime('%H:%M:%S') }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center">No attendance records for this date</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Attendance Summary Card -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Attendance Summary</h6>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                    Total Employees</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ employees_count }}</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-users fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card border-left-success shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                    Present Today</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ attendance_records|length }}</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card border-left-danger shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                    Absent Today</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                    {{ employees_count - attendance_records|length }}
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-times-circle fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initialize DataTable
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof $.fn.DataTable !== 'undefined') {
+            $('#attendanceTable').DataTable({
+                order: [[3, 'asc']]
+            });
+        }
+        
+        // Export functionality
+        document.getElementById('exportBtn').addEventListener('click', function() {
+            // Simple CSV export
+            const table = document.getElementById('attendanceTable');
+            let csv = [];
+            
+            // Get headers
+            const headers = [];
+            const headerCells = table.querySelectorAll('thead th');
+            headerCells.forEach(cell => headers.push(cell.textContent.trim()));
+            csv.push(headers.join(','));
+            
+            // Get rows
+            const rows = table.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                if (!row.querySelector('td[colspan]')) {
+                    const rowData = [];
+                    const cells = row.querySelectorAll('td');
+                    cells.forEach(cell => rowData.push('"' + cell.textContent.trim() + '"'));
+                    csv.push(rowData.join(','));
+                }
+            });
+            
+            // Download CSV
+            const csvContent = csv.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'attendance_{{ selected_date.strftime("%Y-%m-%d") }}.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Employees - Face Recognition Admin{% endblock %}
+
+{% block page_title %}Employees{% endblock %}
+
+{% block content %}
+<!-- Page Heading -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Employee Management</h1>
+    <a href="{{ url_for('admin.add_employee') }}" class="btn btn-primary">
+        <i class="fas fa-user-plus"></i> Add Employee
+    </a>
+</div>
+
+<!-- Employees Table Card -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Registered Employees</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="employeesTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Position</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Added On</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for employee in employees %}
+                    <tr>
+                        <td>{{ employee.id }}</td>
+                        <td>{{ employee.name }}</td>
+                        <td>{{ employee.position or 'N/A' }}</td>
+                        <td>{{ employee.email or 'N/A' }}</td>
+                        <td>{{ employee.phone or 'N/A' }}</td>
+                        <td>{{ employee.created_at.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{{ url_for('admin.edit_employee', id=employee.id) }}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ employee.id }}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Delete Modal -->
+                            <div class="modal fade" id="deleteModal{{ employee.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ employee.id }}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="deleteModalLabel{{ employee.id }}">Confirm Delete</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Are you sure you want to delete employee <strong>{{ employee.name }}</strong>? This action cannot be undone.
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <form action="{{ url_for('admin.delete_employee', id=employee.id) }}" method="post">
+                                                <button type="submit" class="btn btn-danger">Delete</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center">No employees registered yet</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initialize DataTable
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof $.fn.DataTable !== 'undefined') {
+            $('#employeesTable').DataTable({
+                order: [[0, 'asc']]
+            });
+        }
+    });
+</script>
+{% endblock %}
