@@ -43,6 +43,9 @@
                         <th>Name</th>
                         <th>Position</th>
                         <th>Check-in Time</th>
+                        <th>Check-out Time</th>
+                        <th>Status</th>
+                        <th>Work Hours</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -51,11 +54,36 @@
                         <td>{{ employee.id }}</td>
                         <td>{{ employee.name }}</td>
                         <td>{{ employee.position or 'N/A' }}</td>
-                        <td>{{ attendance.timestamp.strftime('%H:%M:%S') }}</td>
+                        <td>{{ attendance.check_in_time.strftime('%H:%M:%S') }}</td>
+                        <td>
+                            {% if attendance.check_out_time %}
+                                {{ attendance.check_out_time.strftime('%H:%M:%S') }}
+                            {% else %}
+                                <span class="badge bg-warning">Not checked out</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if attendance.status == 'check-in' %}
+                                <span class="badge bg-success">Checked In</span>
+                            {% elif attendance.status == 'check-out' %}
+                                <span class="badge bg-primary">Checked Out</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ attendance.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if attendance.work_hours %}
+                                <span class="badge bg-info">{{ attendance.work_hours }} hours</span>
+                            {% elif attendance.status == 'check-in' %}
+                                <span class="badge bg-warning">In progress</span>
+                            {% else %}
+                                <span class="badge bg-secondary">N/A</span>
+                            {% endif %}
+                        </td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="4" class="text-center">No attendance records for this date</td>
+                        <td colspan="7" class="text-center">No attendance records for this date</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -87,7 +115,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-md-4 mb-4">
                 <div class="card border-left-success shadow h-100 py-2">
                     <div class="card-body">
@@ -104,7 +132,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-md-4 mb-4">
                 <div class="card border-left-danger shadow h-100 py-2">
                     <div class="card-body">
@@ -137,19 +165,19 @@
                 order: [[3, 'asc']]
             });
         }
-        
+
         // Export functionality
         document.getElementById('exportBtn').addEventListener('click', function() {
             // Simple CSV export
             const table = document.getElementById('attendanceTable');
             let csv = [];
-            
+
             // Get headers
             const headers = [];
             const headerCells = table.querySelectorAll('thead th');
             headerCells.forEach(cell => headers.push(cell.textContent.trim()));
             csv.push(headers.join(','));
-            
+
             // Get rows
             const rows = table.querySelectorAll('tbody tr');
             rows.forEach(row => {
@@ -160,7 +188,7 @@
                     csv.push(rowData.join(','));
                 }
             });
-            
+
             // Download CSV
             const csvContent = csv.join('\n');
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });

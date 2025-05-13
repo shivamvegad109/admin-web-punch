@@ -8,148 +8,376 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <!-- Custom CSS -->
     <style>
         :root {
-            --primary-color: #4e73df;
-            --secondary-color: #858796;
-            --success-color: #1cc88a;
-            --info-color: #36b9cc;
-            --warning-color: #f6c23e;
-            --danger-color: #e74a3b;
-            --light-color: #f8f9fc;
-            --dark-color: #5a5c69;
+            --primary-color: #4361ee;
+            --primary-light: #4895ef;
+            --primary-dark: #3f37c9;
+            --secondary-color: #4cc9f0;
+            --success-color: #4ade80;
+            --info-color: #0ea5e9;
+            --warning-color: #fbbf24;
+            --danger-color: #f43f5e;
+            --light-color: #f8fafc;
+            --dark-color: #1e293b;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
         }
-        
+
         body {
-            font-family: 'Nunito', sans-serif;
-            background-color: #f8f9fc;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--gray-100);
+            color: var(--gray-700);
+            overflow-x: hidden;
         }
-        
+
+        /* Modern Sidebar */
         .sidebar {
             min-height: 100vh;
-            background: linear-gradient(180deg, var(--primary-color) 10%, #224abe 100%);
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
             color: white;
             position: fixed;
-            width: 250px;
-            z-index: 1;
+            width: 280px;
+            z-index: 100;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
         }
-        
+
+        .sidebar .brand-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #fff, var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.05rem;
+            margin: 0;
+            padding: 0;
+        }
+
         .sidebar .nav-link {
-            color: rgba(255, 255, 255, 0.8);
-            padding: 1rem;
-            font-weight: 600;
-            border-left: 4px solid transparent;
+            color: rgba(255, 255, 255, 0.85);
+            padding: 0.85rem 1.5rem;
+            font-weight: 500;
+            border-radius: 8px;
+            margin: 0.3rem 0.8rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
         }
-        
+
         .sidebar .nav-link:hover {
             color: white;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-left: 4px solid white;
+            background-color: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
         }
-        
+
         .sidebar .nav-link.active {
-            color: white;
-            background-color: rgba(255, 255, 255, 0.2);
-            border-left: 4px solid white;
+            color: var(--primary-dark);
+            background-color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
-        
+
         .sidebar .nav-link i {
-            margin-right: 0.5rem;
-            width: 20px;
+            margin-right: 0.8rem;
+            width: 24px;
+            height: 24px;
+            font-size: 1.1rem;
             text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
         }
-        
+
+        .sidebar .nav-link:hover i {
+            transform: scale(1.1);
+        }
+
         .content {
-            margin-left: 250px;
-            padding: 20px;
+            margin-left: 280px;
+            padding: 25px;
+            transition: all 0.3s ease;
         }
-        
+
+        /* Modern Cards */
         .card {
             border: none;
-            border-radius: 10px;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-            margin-bottom: 20px;
+            border-radius: 16px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+            overflow: hidden;
         }
-        
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
         .card-header {
             background-color: white;
-            border-bottom: 1px solid #e3e6f0;
-            font-weight: bold;
-            color: var(--dark-color);
+            border-bottom: 1px solid var(--gray-200);
+            padding: 1.2rem 1.5rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
-        
+
         .card-header h6 {
             margin: 0;
-            font-weight: 700;
-            font-size: 1rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--gray-800);
         }
-        
+
+        .card-header .card-tools {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Buttons */
+        .btn {
+            border-radius: 8px;
+            padding: 0.5rem 1.2rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
         .btn-primary {
             background-color: var(--primary-color);
             border-color: var(--primary-color);
+            box-shadow: 0 4px 10px rgba(67, 97, 238, 0.3);
         }
-        
+
         .btn-primary:hover {
-            background-color: #2e59d9;
-            border-color: #2e59d9;
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(67, 97, 238, 0.4);
         }
-        
+
+        .btn-success {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+            box-shadow: 0 4px 10px rgba(74, 222, 128, 0.3);
+        }
+
+        .btn-success:hover {
+            background-color: #22c55e;
+            border-color: #22c55e;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(74, 222, 128, 0.4);
+        }
+
+        .btn-info {
+            background-color: var(--info-color);
+            border-color: var(--info-color);
+            box-shadow: 0 4px 10px rgba(14, 165, 233, 0.3);
+        }
+
+        .btn-info:hover {
+            background-color: #0284c7;
+            border-color: #0284c7;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(14, 165, 233, 0.4);
+        }
+
+        /* Tables */
         .table {
-            color: var(--dark-color);
+            color: var(--gray-700);
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
         }
-        
+
         .table thead th {
-            background-color: #f8f9fc;
+            background-color: var(--gray-100);
             border-top: none;
-        }
-        
-        .brand-text {
-            font-size: 1.5rem;
-            font-weight: 800;
+            color: var(--gray-600);
+            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.05rem;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            padding: 1rem;
         }
-        
+
+        .table tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        .table tbody tr:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .table td {
+            padding: 1rem;
+            vertical-align: middle;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        /* Topbar */
         .topbar {
             height: 70px;
             background-color: white;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-            z-index: 1;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            z-index: 10;
+            border-radius: 12px;
+            margin-bottom: 25px;
         }
-        
+
         .dropdown-menu {
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             border: none;
+            border-radius: 12px;
+            padding: 0.5rem;
         }
-        
+
+        .dropdown-item {
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--gray-100);
+        }
+
         .dropdown-item:active {
             background-color: var(--primary-color);
+            color: white;
         }
-        
+
+        /* Stat Cards */
         .stat-card {
-            border-left: 4px solid;
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+            height: 100%;
         }
-        
-        .stat-card.primary {
-            border-left-color: var(--primary-color);
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 6px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary-color), var(--primary-light));
+            border-radius: 6px 0 0 6px;
         }
-        
-        .stat-card.success {
-            border-left-color: var(--success-color);
+
+        .stat-card.primary::before {
+            background: linear-gradient(to bottom, var(--primary-color), var(--primary-light));
         }
-        
-        .stat-card.info {
-            border-left-color: var(--info-color);
+
+        .stat-card.success::before {
+            background: linear-gradient(to bottom, var(--success-color), #86efac);
         }
-        
-        .stat-card.warning {
-            border-left-color: var(--warning-color);
+
+        .stat-card.info::before {
+            background: linear-gradient(to bottom, var(--info-color), #7dd3fc);
         }
-        
+
+        .stat-card.warning::before {
+            background: linear-gradient(to bottom, var(--warning-color), #fed7aa);
+        }
+
+        .stat-card .card-body {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+        }
+
         .stat-card .icon {
-            font-size: 2rem;
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            opacity: 0.2;
+            position: absolute;
+            right: 1rem;
+            bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover .icon {
+            transform: scale(1.2);
             opacity: 0.3;
+        }
+
+        .stat-card .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.9rem;
+            color: var(--gray-500);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Alerts */
+        .alert {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+        /* Chart Area */
+        .chart-area {
+            position: relative;
+            height: 300px; /* Fixed height to prevent excessive scrolling */
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .chart-area canvas {
+            max-height: 300px;
+        }
+
+        /* Chart tabs */
+        .chart-tabs {
+            display: flex;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .chart-tab {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
+            color: var(--gray-600);
+            transition: all 0.3s ease;
+        }
+
+        .chart-tab:hover {
+            color: var(--primary-color);
+        }
+
+        .chart-tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
         }
     </style>
     {% block extra_css %}{% endblock %}
@@ -158,61 +386,122 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="d-flex align-items-center justify-content-center py-4">
-            <span class="brand-text text-white">Face Recognition</span>
+            <div class="text-center">
+                <i class="fas fa-id-badge fa-3x mb-2" style="color: rgba(255,255,255,0.8);"></i>
+                <h1 class="brand-text">Face Recognition</h1>
+                <div class="badge bg-light text-primary mt-2">Office Edition</div>
+            </div>
         </div>
-        <hr class="sidebar-divider my-0">
-        <ul class="nav flex-column">
+        <hr class="sidebar-divider my-3 opacity-25">
+        <ul class="nav flex-column mt-2">
             <li class="nav-item">
                 <a class="nav-link {% if request.path == '/admin/' %}active{% endif %}" href="{{ url_for('admin.dashboard') }}">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <i class="fas fa-tachometer-alt"></i>
                     <span>Dashboard</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {% if '/admin/employees' in request.path %}active{% endif %}" href="{{ url_for('admin.employees') }}">
-                    <i class="fas fa-fw fa-users"></i>
+                    <i class="fas fa-users"></i>
                     <span>Employees</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {% if '/admin/attendance' in request.path %}active{% endif %}" href="{{ url_for('admin.attendance') }}">
-                    <i class="fas fa-fw fa-calendar-check"></i>
+                    <i class="fas fa-calendar-check"></i>
                     <span>Attendance</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {% if '/admin/settings' in request.path %}active{% endif %}" href="{{ url_for('admin.settings') }}">
-                    <i class="fas fa-fw fa-cog"></i>
+                    <i class="fas fa-cog"></i>
                     <span>Settings</span>
                 </a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item mt-2">
                 <a class="nav-link" href="{{ url_for('main.index') }}">
-                    <i class="fas fa-fw fa-video"></i>
+                    <i class="fas fa-video"></i>
                     <span>Live View</span>
                 </a>
             </li>
         </ul>
+
+        <!-- System Status -->
+        <div class="mt-auto p-3 mb-4">
+            <div class="system-status p-3 rounded" style="background: rgba(0,0,0,0.2);">
+                <h6 class="text-white mb-3"><i class="fas fa-server me-2"></i> System Status</h6>
+                <div class="d-flex align-items-center mb-2">
+                    <div class="status-indicator me-2" style="width: 10px; height: 10px; border-radius: 50%; background-color: #4ade80;"></div>
+                    <small class="text-white">System Active</small>
+                </div>
+                <div class="d-flex align-items-center">
+                    <div class="status-indicator me-2" style="width: 10px; height: 10px; border-radius: 50%; background-color: #4ade80;"></div>
+                    <small class="text-white">Camera Connected</small>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Content Wrapper -->
     <div class="content">
         <!-- Topbar -->
-        <nav class="navbar navbar-expand topbar mb-4 static-top">
+        <nav class="navbar navbar-expand topbar mb-4">
             <div class="container-fluid">
-                <h1 class="h3 mb-0 text-gray-800">{% block page_title %}Dashboard{% endblock %}</h1>
-                <ul class="navbar-nav ml-auto">
+                <div class="d-flex align-items-center">
+                    <h1 class="h3 mb-0 text-gray-800 animate__animated animate__fadeIn">{% block page_title %}Dashboard{% endblock %}</h1>
+                    <span class="badge bg-primary ms-3 animate__animated animate__fadeIn">Office Environment</span>
+                </div>
+
+                <ul class="navbar-nav ms-auto">
+                    <!-- Search -->
+                    <li class="nav-item me-3">
+                        <form class="d-none d-sm-inline-block">
+                            <div class="input-group">
+                                <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..." aria-label="Search">
+                                <button class="btn btn-primary" type="button">
+                                    <i class="fas fa-search fa-sm"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </li>
+
+                    <!-- Notifications -->
+                    <li class="nav-item dropdown me-3">
+                        <a class="nav-link" href="#" id="alertsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-bell fa-fw"></i>
+                            <span id="notification-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;">0</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end shadow animated--grow-in" aria-labelledby="alertsDropdown" style="width: 300px; max-height: 400px; overflow-y: auto;">
+                            <h6 class="dropdown-header d-flex justify-content-between align-items-center">
+                                <span>Notifications</span>
+                                <button id="mark-all-read" class="btn btn-sm btn-link p-0 text-primary" style="font-size: 0.8rem;">Mark all as read</button>
+                            </h6>
+                            <div id="notification-list">
+                                <!-- Notifications will be loaded here -->
+                                <div class="text-center p-3 text-muted" id="no-notifications" style="display: none;">
+                                    <i class="fas fa-bell-slash mb-2"></i>
+                                    <p class="mb-0">No new notifications</p>
+                                </div>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-center small text-gray-500" href="#" id="load-more-notifications">
+                                Show All Notifications
+                            </a>
+                        </div>
+                    </li>
+
+                    <!-- User -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                            data-bs-toggle="dropdown" aria-expanded="false">
-                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">Admin</span>
-                            <i class="fas fa-user-circle fa-fw"></i>
+                            <span class="d-none d-lg-inline text-gray-600 small me-2">Admin</span>
+                            <img class="img-profile rounded-circle" src="https://ui-avatars.com/api/?name=Admin&background=4361ee&color=fff" width="32" height="32">
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i> Profile</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i> Settings</a></li>
+                        <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i> Profile</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin.settings') }}"><i class="fas fa-cogs fa-sm fa-fw me-2 text-gray-400"></i> Settings</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i> Logout</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt fa-sm fa-fw me-2 text-gray-400"></i> Logout</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -222,26 +511,210 @@
         <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category if category != 'message' else 'info' }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
+                <div class="flash-messages animate__animated animate__fadeInDown">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category if category != 'message' else 'info' }} alert-dismissible fade show" role="alert">
+                            <div class="d-flex align-items-center">
+                                <i class="fas
+                                    {% if category == 'success' %}fa-check-circle{% endif %}
+                                    {% if category == 'danger' %}fa-exclamation-circle{% endif %}
+                                    {% if category == 'warning' %}fa-exclamation-triangle{% endif %}
+                                    {% if category == 'info' or category == 'message' %}fa-info-circle{% endif %}
+                                    me-2"></i>
+                                <div>{{ message }}</div>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                </div>
             {% endif %}
         {% endwith %}
 
         <!-- Main Content -->
-        <div class="container-fluid">
+        <div class="container-fluid pb-5">
             {% block content %}{% endblock %}
         </div>
+
+        <!-- Footer -->
+        <footer class="footer mt-auto py-3 bg-white shadow-sm rounded-top">
+            <div class="container-fluid">
+                <div class="row align-items-center">
+                    <div class="col-md-6 small">
+                        <span>Copyright &copy; Face Recognition System 2023</span>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <span class="text-muted">Version 2.0 | Office Edition</span>
+                    </div>
+                </div>
+            </div>
+        </footer>
     </div>
 
     <!-- Bootstrap JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <!-- Custom JS -->
+    <script>
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+
+        // Flash message auto-dismiss
+        window.setTimeout(function() {
+            $(".alert").fadeTo(500, 0).slideUp(500, function(){
+                $(this).remove();
+            });
+        }, 5000);
+
+        // Notifications handling
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const notificationBadge = document.getElementById('notification-badge');
+            const notificationList = document.getElementById('notification-list');
+            const noNotifications = document.getElementById('no-notifications');
+            const markAllReadBtn = document.getElementById('mark-all-read');
+            const loadMoreBtn = document.getElementById('load-more-notifications');
+
+            // Load notifications on page load
+            loadNotifications();
+
+            // Set up periodic refresh (every 30 seconds)
+            setInterval(loadNotifications, 30000);
+
+            // Mark all as read button
+            markAllReadBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                fetch('/admin/api/notifications/read-all', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update UI
+                        updateNotificationBadge(0);
+                        loadNotifications();
+                    }
+                })
+                .catch(error => console.error('Error marking all as read:', error));
+            });
+
+            // Load more button
+            loadMoreBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                loadNotifications(20, true);
+            });
+
+            // Function to load notifications
+            function loadNotifications(limit = 5, includeRead = false) {
+                fetch(`/admin/api/notifications?limit=${limit}&include_read=${includeRead}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update badge
+                        updateNotificationBadge(data.unread_count);
+
+                        // Update notification list
+                        renderNotifications(data.notifications);
+                    }
+                })
+                .catch(error => console.error('Error loading notifications:', error));
+            }
+
+            // Function to render notifications
+            function renderNotifications(notifications) {
+                // Clear existing notifications (except the no-notifications message)
+                const items = notificationList.querySelectorAll('.notification-item');
+                items.forEach(item => item.remove());
+
+                if (notifications.length === 0) {
+                    noNotifications.style.display = 'block';
+                } else {
+                    noNotifications.style.display = 'none';
+
+                    // Add notifications
+                    notifications.forEach(notification => {
+                        const item = createNotificationItem(notification);
+                        notificationList.insertBefore(item, notificationList.firstChild);
+                    });
+                }
+            }
+
+            // Function to create a notification item
+            function createNotificationItem(notification) {
+                const item = document.createElement('a');
+                item.className = `dropdown-item d-flex align-items-center notification-item ${notification.is_read ? 'text-muted' : 'fw-bold'}`;
+                item.href = '#';
+                item.dataset.id = notification.id;
+
+                // Determine background color based on notification type
+                let bgClass = 'bg-primary';
+                if (notification.type === 'success') bgClass = 'bg-success';
+                if (notification.type === 'warning') bgClass = 'bg-warning';
+                if (notification.type === 'danger') bgClass = 'bg-danger';
+
+                item.innerHTML = `
+                    <div class="me-3">
+                        <div class="icon-circle ${bgClass}">
+                            <i class="fas ${notification.icon} text-white"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="small text-gray-500">${notification.time_ago}</div>
+                        <span>${notification.message}</span>
+                    </div>
+                `;
+
+                // Add click event to mark as read
+                if (!notification.is_read) {
+                    item.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        markAsRead(notification.id, item);
+                    });
+                }
+
+                return item;
+            }
+
+            // Function to mark a notification as read
+            function markAsRead(id, element) {
+                fetch(`/admin/api/notifications/read/${id}`, {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update UI
+                        element.classList.remove('fw-bold');
+                        element.classList.add('text-muted');
+                        updateNotificationBadge(data.unread_count);
+                    }
+                })
+                .catch(error => console.error('Error marking as read:', error));
+            }
+
+            // Function to update the notification badge
+            function updateNotificationBadge(count) {
+                if (count > 0) {
+                    notificationBadge.textContent = count;
+                    notificationBadge.style.display = 'inline-block';
+                } else {
+                    notificationBadge.style.display = 'none';
+                }
+            }
+        });
+    </script>
+
     {% block extra_js %}{% endblock %}
 </body>
 </html>

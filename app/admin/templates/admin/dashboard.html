@@ -43,42 +43,56 @@
         </div>
     </div>
 
-    <!-- Attendance Rate Card -->
+    <!-- Currently Checked In Card -->
     <div class="col-xl-3 col-md-6 mb-4">
         <div class="card stat-card info h-100">
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                            Attendance Rate</div>
+                            Currently Checked In</div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">
-                            {% if employee_count > 0 %}
-                                {{ (attendance_today / employee_count * 100) | round(1) }}%
-                            {% else %}
-                                0%
-                            {% endif %}
+                            {{ checked_in_count }}
                         </div>
                     </div>
                     <div class="col-auto">
-                        <i class="fas fa-percentage fa-2x text-gray-300 icon"></i>
+                        <i class="fas fa-sign-in-alt fa-2x text-gray-300 icon"></i>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- System Status Card -->
+    <!-- Checked Out Card -->
     <div class="col-xl-3 col-md-6 mb-4">
         <div class="card stat-card warning h-100">
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                            System Status</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">Active</div>
+                            Checked Out Today</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ checked_out_count }}</div>
                     </div>
                     <div class="col-auto">
-                        <i class="fas fa-check-circle fa-2x text-gray-300 icon"></i>
+                        <i class="fas fa-sign-out-alt fa-2x text-gray-300 icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Work Hours Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stat-card success h-100">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Total Work Hours Today</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_work_hours | round(1) }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-clock fa-2x text-gray-300 icon"></i>
                     </div>
                 </div>
             </div>
@@ -93,8 +107,17 @@
         <div class="card shadow mb-4">
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-primary">Weekly Attendance</h6>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-sm btn-outline-primary" id="toggleChartView">
+                        <i class="fas fa-chart-bar me-1"></i> Change View
+                    </button>
+                </div>
             </div>
             <div class="card-body">
+                <div class="chart-tabs">
+                    <div class="chart-tab active" data-chart="attendance">Attendance</div>
+                    <div class="chart-tab" data-chart="hours">Work Hours</div>
+                </div>
                 <div class="chart-area">
                     <canvas id="weeklyAttendanceChart"></canvas>
                 </div>
@@ -115,17 +138,36 @@
                             <tr>
                                 <th>Employee</th>
                                 <th>Time</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for attendance, employee in recent_attendance %}
                             <tr>
                                 <td>{{ employee.name }}</td>
-                                <td>{{ attendance.timestamp.strftime('%H:%M:%S') }}</td>
+                                <td>
+                                    {% if attendance.status == 'check-out' %}
+                                        {{ attendance.check_out_time.strftime('%H:%M:%S') }}
+                                    {% else %}
+                                        {{ attendance.check_in_time.strftime('%H:%M:%S') }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if attendance.status == 'check-in' %}
+                                        <span class="badge bg-success">IN</span>
+                                    {% elif attendance.status == 'check-out' %}
+                                        <span class="badge bg-primary">OUT</span>
+                                        {% if attendance.work_hours %}
+                                            <small class="text-muted">({{ attendance.work_hours }}h)</small>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ attendance.status }}</span>
+                                    {% endif %}
+                                </td>
                             </tr>
                             {% else %}
                             <tr>
-                                <td colspan="2" class="text-center">No recent attendance records</td>
+                                <td colspan="3" class="text-center">No recent attendance records</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -180,57 +222,184 @@
         .then(data => {
             const labels = data.map(item => {
                 const date = new Date(item.date);
-                return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+                return date.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' });
             });
+
+            // Extract data for different metrics
             const counts = data.map(item => item.count);
-            
-            // Create chart
+            const checkedIn = data.map(item => item.checked_in);
+            const checkedOut = data.map(item => item.checked_out);
+            const workHours = data.map(item => item.work_hours);
+
+            // Chart configuration
             const ctx = document.getElementById('weeklyAttendanceChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Attendance',
-                        data: counts,
-                        backgroundColor: 'rgba(78, 115, 223, 0.05)',
-                        borderColor: 'rgba(78, 115, 223, 1)',
-                        pointBackgroundColor: 'rgba(78, 115, 223, 1)',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: 'rgba(78, 115, 223, 1)',
-                        borderWidth: 2,
-                        fill: true
-                    }]
-                },
-                options: {
-                    maintainAspectRatio: false,
-                    layout: {
-                        padding: {
-                            left: 10,
-                            right: 25,
-                            top: 25,
-                            bottom: 0
-                        }
+            let attendanceChart;
+            let currentView = 'attendance';
+
+            // Create attendance chart (default view)
+            function createAttendanceChart() {
+                if (attendanceChart) {
+                    attendanceChart.destroy();
+                }
+
+                attendanceChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Total',
+                                data: counts,
+                                backgroundColor: 'rgba(78, 115, 223, 0.7)',
+                                borderColor: 'rgba(78, 115, 223, 1)',
+                                borderWidth: 1,
+                                order: 3
+                            },
+                            {
+                                label: 'In',
+                                data: checkedIn,
+                                backgroundColor: 'rgba(28, 200, 138, 0.7)',
+                                borderColor: 'rgba(28, 200, 138, 1)',
+                                borderWidth: 1,
+                                order: 2
+                            },
+                            {
+                                label: 'Out',
+                                data: checkedOut,
+                                backgroundColor: 'rgba(246, 194, 62, 0.7)',
+                                borderColor: 'rgba(246, 194, 62, 1)',
+                                borderWidth: 1,
+                                order: 1
+                            }
+                        ]
                     },
-                    scales: {
-                        x: {
-                            grid: {
-                                display: false
+                    options: {
+                        maintainAspectRatio: false,
+                        layout: {
+                            padding: {
+                                left: 5,
+                                right: 15,
+                                top: 15,
+                                bottom: 0
                             }
                         },
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                precision: 0
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    precision: 0
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                labels: {
+                                    boxWidth: 12,
+                                    usePointStyle: true,
+                                    pointStyle: 'circle'
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    afterBody: function(context) {
+                                        const index = context[0].dataIndex;
+                                        return `Work Hours: ${workHours[index]} hours`;
+                                    }
+                                }
                             }
                         }
+                    }
+                });
+            }
+
+            // Create work hours chart
+            function createWorkHoursChart() {
+                if (attendanceChart) {
+                    attendanceChart.destroy();
+                }
+
+                attendanceChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Work Hours',
+                            data: workHours,
+                            backgroundColor: 'rgba(54, 185, 204, 0.1)',
+                            borderColor: 'rgba(54, 185, 204, 1)',
+                            pointBackgroundColor: 'rgba(54, 185, 204, 1)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgba(54, 185, 204, 1)',
+                            borderWidth: 2,
+                            fill: true
+                        }]
                     },
-                    plugins: {
-                        legend: {
-                            display: false
+                    options: {
+                        maintainAspectRatio: false,
+                        layout: {
+                            padding: {
+                                left: 5,
+                                right: 15,
+                                top: 15,
+                                bottom: 0
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Hours'
+                                }
+                            }
                         }
                     }
+                });
+            }
+
+            // Initialize with attendance chart
+            createAttendanceChart();
+
+            // Handle chart tab clicks
+            document.querySelectorAll('.chart-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Update active tab
+                    document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // Switch chart view
+                    const chartType = this.getAttribute('data-chart');
+                    if (chartType === 'attendance') {
+                        createAttendanceChart();
+                        currentView = 'attendance';
+                    } else if (chartType === 'hours') {
+                        createWorkHoursChart();
+                        currentView = 'hours';
+                    }
+                });
+            });
+
+            // Toggle button for chart view
+            document.getElementById('toggleChartView').addEventListener('click', function() {
+                if (currentView === 'attendance') {
+                    // Switch to hours view
+                    document.querySelector('.chart-tab[data-chart="hours"]').click();
+                } else {
+                    // Switch to attendance view
+                    document.querySelector('.chart-tab[data-chart="attendance"]').click();
                 }
             });
         })

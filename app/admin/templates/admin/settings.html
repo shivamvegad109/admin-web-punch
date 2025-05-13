@@ -19,7 +19,7 @@
                         <input type="text" class="form-control" id="rtspUrl" name="rtspUrl" value="{{ config.RTSP_URL }}">
                         <div class="form-text">URL for IP camera. Leave empty to use default webcam.</div>
                     </div>
-                    
+
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="resolution" class="form-label">Resolution</label>
@@ -38,12 +38,12 @@
                             </select>
                         </div>
                     </div>
-                    
+
                     <button type="submit" class="btn btn-primary">Save Camera Settings</button>
                 </form>
             </div>
         </div>
-        
+
         <!-- Face Recognition Settings Card -->
         <div class="card shadow mb-4">
             <div class="card-header py-3">
@@ -60,7 +60,7 @@
                             <span>High (More Accurate)</span>
                         </div>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="recognitionModel" class="form-label">Recognition Model</label>
                         <select class="form-select" id="recognitionModel" name="recognitionModel">
@@ -68,7 +68,7 @@
                             <option value="cnn">CNN (GPU, More Accurate)</option>
                         </select>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="matchThreshold" class="form-label">Match Threshold</label>
                         <input type="range" class="form-range" min="0.4" max="0.8" step="0.05" id="matchThreshold" name="matchThreshold" value="0.6">
@@ -78,13 +78,13 @@
                             <span>High (More Accurate)</span>
                         </div>
                     </div>
-                    
+
                     <button type="submit" class="btn btn-primary">Save Recognition Settings</button>
                 </form>
             </div>
         </div>
     </div>
-    
+
     <div class="col-lg-6">
         <!-- System Settings Card -->
         <div class="card shadow mb-4">
@@ -93,32 +93,76 @@
             </div>
             <div class="card-body">
                 <form id="systemSettingsForm">
+                    <h6 class="mb-3 text-primary">Attendance Settings</h6>
+
                     <div class="mb-3">
                         <label for="attendanceCooldown" class="form-label">Attendance Cooldown (minutes)</label>
-                        <input type="number" class="form-control" id="attendanceCooldown" name="attendanceCooldown" value="5" min="1" max="60">
+                        <input type="number" class="form-control" id="attendanceCooldown" name="attendanceCooldown" value="{{ settings.cooldown_minutes }}" min="1" max="60">
                         <div class="form-text">Minimum time between attendance logs for the same person.</div>
                     </div>
-                    
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="workStartHour" class="form-label">Work Start Hour</label>
+                            <select class="form-select" id="workStartHour" name="workStartHour">
+                                {% for hour in range(0, 24) %}
+                                <option value="{{ hour }}" {% if hour == settings.work_start_hour %}selected{% endif %}>
+                                    {{ "%02d"|format(hour) }}:00
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">Default work start time.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="workEndHour" class="form-label">Work End Hour</label>
+                            <select class="form-select" id="workEndHour" name="workEndHour">
+                                {% for hour in range(0, 24) %}
+                                <option value="{{ hour }}" {% if hour == settings.work_end_hour %}selected{% endif %}>
+                                    {{ "%02d"|format(hour) }}:00
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">Default work end time.</div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="minWorkHours" class="form-label">Minimum Hours Between Check-in/Check-out</label>
+                        <input type="number" class="form-control" id="minWorkHours" name="minWorkHours" value="{{ settings.min_hours }}" min="0.1" max="12" step="0.1">
+                        <div class="form-text">Minimum hours required before allowing check-out.</div>
+                    </div>
+
                     <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="enableNotifications" name="enableNotifications">
+                        <input type="checkbox" class="form-check-input" id="autoCheckout" name="autoCheckout" checked>
+                        <label class="form-check-label" for="autoCheckout">Auto Check-out at End of Day</label>
+                        <div class="form-text">Automatically check out employees who didn't check out at the end of work hours.</div>
+                    </div>
+
+                    <h6 class="mb-3 mt-4 text-primary">System Settings</h6>
+
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="enableNotifications" name="enableNotifications" {% if settings.enable_notifications %}checked{% endif %}>
                         <label class="form-check-label" for="enableNotifications">Enable Notifications</label>
+                        <div class="form-text">Show system notifications in the admin panel.</div>
                     </div>
-                    
+
                     <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="showFPS" name="showFPS" checked>
+                        <input type="checkbox" class="form-check-input" id="showFPS" name="showFPS" {% if settings.show_fps %}checked{% endif %}>
                         <label class="form-check-label" for="showFPS">Show FPS Counter</label>
+                        <div class="form-text">Display frames per second counter on the video feed.</div>
                     </div>
-                    
+
                     <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="enableDebug" name="enableDebug">
+                        <input type="checkbox" class="form-check-input" id="enableDebug" name="enableDebug" {% if settings.enable_debug %}checked{% endif %}>
                         <label class="form-check-label" for="enableDebug">Enable Debug Mode</label>
+                        <div class="form-text">Show additional debug information in logs and UI.</div>
                     </div>
-                    
+
                     <button type="submit" class="btn btn-primary">Save System Settings</button>
                 </form>
             </div>
         </div>
-        
+
         <!-- Database Settings Card -->
         <div class="card shadow mb-4">
             <div class="card-header py-3">
@@ -130,19 +174,19 @@
                     <p>Type: SQLite</p>
                     <p>Path: {{ config.DB_PATH }}</p>
                 </div>
-                
+
                 <div class="mb-3">
                     <button id="backupBtn" class="btn btn-info">
                         <i class="fas fa-download"></i> Backup Database
                     </button>
                 </div>
-                
+
                 <div class="mb-3">
                     <button id="rebuildBtn" class="btn btn-warning">
                         <i class="fas fa-sync"></i> Rebuild Face Encodings
                     </button>
                 </div>
-                
+
                 <div class="mb-3">
                     <button id="purgeBtn" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#purgeModal">
                         <i class="fas fa-trash"></i> Purge Old Records
@@ -185,48 +229,109 @@
     document.getElementById('detectionConfidence').addEventListener('input', function() {
         document.getElementById('confidenceValue').textContent = this.value;
     });
-    
+
     document.getElementById('matchThreshold').addEventListener('input', function() {
         document.getElementById('thresholdValue').textContent = this.value;
     });
-    
+
     // Form submission handlers
     document.getElementById('cameraSettingsForm').addEventListener('submit', function(e) {
         e.preventDefault();
         // In a real app, this would save to the server
         alert('Camera settings saved!');
     });
-    
+
     document.getElementById('faceRecognitionForm').addEventListener('submit', function(e) {
         e.preventDefault();
         // In a real app, this would save to the server
         alert('Face recognition settings saved!');
     });
-    
+
     document.getElementById('systemSettingsForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        // In a real app, this would save to the server
-        alert('System settings saved!');
+
+        // Get form values
+        const attendanceCooldown = document.getElementById('attendanceCooldown').value;
+        const workStartHour = document.getElementById('workStartHour').value;
+        const workEndHour = document.getElementById('workEndHour').value;
+        const minWorkHours = document.getElementById('minWorkHours').value;
+        const autoCheckout = document.getElementById('autoCheckout').checked;
+
+        // Validate work hours
+        if (parseInt(workStartHour) >= parseInt(workEndHour)) {
+            alert('Work end time must be after work start time.');
+            return;
+        }
+
+        // Create settings object
+        const settings = {
+            attendance_cooldown: attendanceCooldown,
+            work_start_hour: workStartHour,
+            work_end_hour: workEndHour,
+            min_work_hours: minWorkHours,
+            auto_checkout: autoCheckout,
+            enable_notifications: document.getElementById('enableNotifications').checked,
+            show_fps: document.getElementById('showFPS').checked,
+            enable_debug: document.getElementById('enableDebug').checked
+        };
+
+        // Save settings via API
+        fetch('/admin/api/settings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(settings)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success message with SweetAlert2
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Work hour and system settings saved successfully!',
+                    icon: 'success',
+                    confirmButtonColor: '#4361ee'
+                });
+            } else {
+                // Show error message
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Error saving settings: ' + data.message,
+                    icon: 'error',
+                    confirmButtonColor: '#4361ee'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                title: 'Error!',
+                text: 'Error saving settings. Please try again.',
+                icon: 'error',
+                confirmButtonColor: '#4361ee'
+            });
+        });
     });
-    
+
     // Database action handlers
     document.getElementById('backupBtn').addEventListener('click', function() {
         // In a real app, this would trigger a database backup
         alert('Database backup started!');
     });
-    
+
     document.getElementById('rebuildBtn').addEventListener('click', function() {
         // In a real app, this would rebuild face encodings
         alert('Rebuilding face encodings. This may take a while...');
     });
-    
+
     document.getElementById('confirmPurgeBtn').addEventListener('click', function() {
         const purgeDate = document.getElementById('purgeDate').value;
         if (!purgeDate) {
             alert('Please select a date.');
             return;
         }
-        
+
         // In a real app, this would purge old records
         alert(`Records older than ${purgeDate} will be purged.`);
         $('#purgeModal').modal('hide');
